@@ -30,6 +30,12 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t nor5/cowsay-app:latest .
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cowsay-go
+          path: myapp
 
       - name: Push Docker image to Docker Hub
         uses: docker/login-action@v3
@@ -38,3 +44,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - run: |
           docker push nor5/cowsay-app:latest
+
+  
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: /var/www/html/
+          name: cowsay-go
